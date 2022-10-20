@@ -11,7 +11,7 @@ import click
 import requests
 from veracode_api_signing.plugin_requests import RequestsAuthPluginVeracodeHMAC
 import sys
-from credentials.credentials_commands import activate_credentials
+from credentials_commands import activate_credentials
 
 
 def print_users_headers(adding_user=None):

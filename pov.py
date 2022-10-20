@@ -8,9 +8,10 @@ import configparser
 import json
 import click
 from constant import SETTINGS_INIT_DICT, SETTINGS, CREDENTIALS, save_settings
-from credentials import credentials_commands as credentials
-from users import user_commands as users
-from applications import application_commands as applications
+import credentials_commands as credentials
+import user_commands as users
+import application_commands as applications
+import subprocess
 
 
 @click.group()
@@ -45,3 +46,24 @@ def main(ctx):
 main.add_command(credentials.credentials)
 main.add_command(users.users)
 main.add_command(applications.applications)
+
+
+@main.command()
+@click.pass_context
+def scan(ctx):
+  """Kick Off a Veracode Scan by Java Wrapper"""
+  java_wrapper_path = click.prompt(
+    'Please paste the absolution path for Java Wrapper').strip()
+  app_name = click.prompt(
+    'Please paste the Application Name for the scan').strip()
+  create_profile = 'true' if click.confirm(
+    'Do you want to create this profile (if not exist)?') else 'false'
+  file_path = click.prompt(
+    'Please paste the full absolute path for the artifact to scan').strip()
+  scan_name = click.prompt('Please enter the scan name').strip()
+
+  cmd = ['java', '-jar', java_wrapper_path, '-action',
+         'UploadAndScan', '-appname', app_name, '-createprofile',
+         create_profile, '-filepath', file_path, '-version', scan_name]
+  p = subprocess.Popen(cmd)
+  p.communicate()

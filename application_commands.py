@@ -11,7 +11,7 @@ import requests
 from veracode_api_signing.plugin_requests import RequestsAuthPluginVeracodeHMAC
 import sys
 from datetime import datetime
-from credentials.credentials_commands import activate_credentials
+from credentials_commands import activate_credentials
 import copy
 import json
 
