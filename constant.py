@@ -4,6 +4,10 @@
 # @Time: 19/10/2022 12:44 pm
 # @Organisation: Veracode
 from pathlib import Path
+import threading
+import sys
+import time
+import json
 
 CREDENTIALS = Path.home() / ".veracode" / "credentials"
 SETTINGS = Path.home() / ".veracode" / "settings.json"
@@ -62,3 +66,41 @@ USER_CREATION_INPUT = {
     {'role_name': 'sandboxuser'}  # Sandbox User
   ]
 }
+
+APPLICATION_CREATION_INPUT = {
+  'profile': {
+    'business_criticality': 'VERY_HIGH',
+    'description': '',
+    'name': '',
+    'policies': [
+      {
+        'guid': '4cbdbf17-7979-4848-bd7f-f5c0e1b67d18'
+        # Veracode Recommended High + SCA
+      }
+    ]
+  }
+}
+
+
+def save_settings(setting_dict):
+  with open(SETTINGS, 'w') as fp:
+    fp.write(json.dumps(setting_dict, indent=4))
+
+
+class SpinnerThread(threading.Thread):
+  def __init__(self):
+    super().__init__(target=self._spin)
+    self.done = False
+
+  def set_complete(self):
+    self.done = True
+
+  def _spin(self):
+    while True:
+      for t in '|/-\\':
+        sys.stdout.write(t)
+        sys.stdout.flush()
+        time.sleep(0.1)
+        sys.stdout.write('\b')
+        if self.done:
+          return
