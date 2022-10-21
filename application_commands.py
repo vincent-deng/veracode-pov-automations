@@ -208,9 +208,8 @@ def delete_application(ctx):
   """Delete a Veracode Application"""
   config = ctx.obj['config']
   setting_dict = ctx.obj['setting']
-  print_applications_header()
+  
   application_list = fetch_applications(setting_dict, config)
-  print_applications(application_list)
 
   while True:
     print_applications_header()

@@ -193,6 +193,39 @@ def list_users(ctx, show_details):
   print_users(user_list, show_details=show_details)
 
 
+def delete_one_user(user, settings_dict, config):
+  spinner_thread = SpinnerThread()
+
+  api_id = config[settings_dict['activated_credentials']]['veracode_api_key_id']
+  api_key = config[settings_dict['activated_credentials']][
+    'veracode_api_key_secret']
+
+  if click.confirm(f'Delete \"{user.first_name}\", continue?'):
+    spinner_thread.start()
+    try:
+      response = requests. \
+        delete(settings_dict[
+                 'admin_base'] + "/users/" + user.user_id,
+               auth=RequestsAuthPluginVeracodeHMAC(api_key_id=api_id,
+                                                   api_key_secret=api_key),
+               headers=settings_dict['headers'])
+    except requests.RequestException as e:
+      click.echo("Whoops!")
+      click.echo(e)
+      sys.exit(1)
+
+    spinner_thread.set_complete()
+    sys.stdout.write('\b')
+
+    if response.ok:
+      return 'success'
+    else:
+      click.secho(f"{response.status_code} "
+                  f"{response.json()['message']}",
+                  fg='red')
+      return 'fail'
+
+
 @users.command('add')
 @click.pass_context
 def add_user(ctx):
@@ -216,15 +249,32 @@ def add_user(ctx):
   add_users_to_platform(user_list, config, setting_dict)
 
 
-@users.command('update')
+@users.command('delete')
 @click.pass_context
-def update_user(ctx):
+def delete_user(ctx):
   """Update Veracode Users"""
-  setting_dict = ctx.obj['setting']
+  """Delete a Veracode Application"""
   config = ctx.obj['config']
-  user_list = []
-  print_users_headers()
-  print_users(setting_dict)
+  setting_dict = ctx.obj['setting']
+
+  user_list = fetch_users(setting_dict, config)
+
+  while True:
+    print_users_headers()
+    print_users(user_list)
+    user_id = click.prompt(
+      "Enter user id (i.e. 3) to delete or \"-1\" to quit", type=int)
+    if user_id == -1:
+      sys.exit(0)
+    if user_id < 1 or user_id > len(user_list):
+      click.secho(f'{user_id} is not in range.', fg='red')
+    else:
+      user = user_list[user_id - 1]
+      result = delete_one_user(user, setting_dict, config)
+      if result == 'fail':
+        sys.exit(1)
+      else:
+        del user_list[user_id - 1]
 
 
 class User:
