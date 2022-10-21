@@ -76,10 +76,13 @@ def add_applications_to_platform(application_list, config, settings_dict):
   api_key = config[settings_dict['activated_credentials']][
     'veracode_api_key_secret']
 
+  count = 0
+
   with click.progressbar(
           length=len(application_list),
           show_eta=False,
-          item_show_func=lambda application_name: f"Adding {application_name}"
+          item_show_func=lambda
+                  application_name: f"Adding application: {application_name}"
   ) as bar:
     for idx, application in enumerate(application_list, start=1):
       application_json = application.get_application_json()
@@ -95,18 +98,20 @@ def add_applications_to_platform(application_list, config, settings_dict):
       except requests.RequestException as e:
         click.echo("Whoops!")
         click.echo(e)
-        sys.exit(1)
+        # sys.exit(1)
 
       if response.ok:
-        pass
+        count += 1
       else:
         click.secho(f"{response.status_code} "
                     f"{response.json()['message']}",
                     fg='red')
-        sys.exit(1)
-      bar.update(idx, application.application_name)
+        # sys.exit(1)
+      bar.update(idx - 1, application.application_name)
 
-  click.secho('Successfully creating platform users.', fg='green')
+  click.secho(
+    f'Successfully created {count} applications on Veracode Platform.',
+    fg='green')
 
 
 def delete_one_application(application, settings_dict, config):
@@ -147,6 +152,12 @@ def delete_one_application(application, settings_dict, config):
 def applications(ctx):
   """Manage Veracode Applications"""
   setting_dict = ctx.obj['setting']
+  config = ctx.obj['config']
+  if not config.sections():
+    click.secho(
+      'You have not configured Veracode API credentials, '
+      'please run \"pov credentials add\" command before running this command.')
+    sys.exit(1)
   use_activated_profile = click.confirm(
     f"Your activated credentials is "
     f"\"{setting_dict['activated_credentials']}\""

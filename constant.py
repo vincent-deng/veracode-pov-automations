@@ -12,8 +12,6 @@ import json
 CREDENTIALS = Path.home() / ".veracode" / "credentials"
 SETTINGS = Path.home() / ".veracode" / "settings.json"
 USER = Path.home() / ".veracode" / "user-creation-input.json"
-DISPLAY_CREDENTIALS_FMT = "{:<3} {:10} {:32} {:<6}"
-DISPLAY_USERS_FMT = "{:<3} {:35} {:12} {:12}"
 DISPLAY_APPLICATION_FMT = "{:<3} {:40} {:40} {:20}"
 
 SETTINGS_INIT_DICT = {

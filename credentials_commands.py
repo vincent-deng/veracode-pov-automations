@@ -5,9 +5,10 @@
 # @Organisation: Veracode
 
 import sys
-
 import click
-from constant import DISPLAY_CREDENTIALS_FMT, CREDENTIALS, save_settings
+from constant import CREDENTIALS, save_settings
+
+DISPLAY_CREDENTIALS_FMT = "{:<3} {:10} {:32} {:<6}"
 
 
 def print_credentials_header():

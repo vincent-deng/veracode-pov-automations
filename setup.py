@@ -6,12 +6,17 @@ setup(
   author='Vincent Deng',
   author_email='vsdeng@veracode.com',
   python_requires='>=3.6',
-  py_modules=['pov', 'constant', 'credentials_commands', 'application_commands',
-              'user_commands'],
+  py_modules=['pov',
+              'constant',
+              'credentials_commands',
+              'application_commands',
+              'user_commands'
+              ],
   install_requires=[
     'Click',
     'requests',
-    'veracode-api-signing'
+    'veracode-api-signing',
+    'openpyxl',
   ],
   entry_points={
     'console_scripts': [
